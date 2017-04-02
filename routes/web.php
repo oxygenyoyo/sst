@@ -17,4 +17,23 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/dashboard', 'AdminController@index');
+Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
+	Route::get('/dashboard', 'DashBoardController@index');
+
+	// Member 
+	Route::get('/member', 'MemberController@index');
+	Route::get('/member/create', 'MemberController@create');
+	Route::post('/member/store', 'MemberController@store');
+});
+
+
+Route::get('/email/verify', function() {
+	$user = \App\User::find(1)->first();
+	// return view('emails/verify', ['user' => $user]);
+	
+	Mail::to('client_email@gmail.com')
+	->send(new \App\Mail\UserRegisterVerify($user,'dev.sst.com/verify/ddlsafjl1dfaueiu123u1i4u'));
+	return 'mail was sent';
+
+});
+

@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-
-class AdminController extends Controller
+use App\Http\Controllers\Admin\Controller;
+use App\User;
+use Session;
+use App\Mail\UserRegisterVerify;
+use Mail;
+class MemberController extends Controller
 {
-	/**
-	 * Create a new controller instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-	    $this->middleware('auth');
-	}
+    public function __construct() 
+    {
+        $this->viewPrefix = $this->viewPrefix . 'member/';
+    }
     /**
      * Display a listing of the resource.
      *
@@ -22,7 +21,8 @@ class AdminController extends Controller
      */
     public function index()
     {
-     	return view('admins/dashboard');   
+        $users = User::all();
+        return view($this->viewPrefix . 'member', ['users' => $users]);
     }
 
     /**
@@ -32,7 +32,7 @@ class AdminController extends Controller
      */
     public function create()
     {
-        //
+        return view($this->viewPrefix . 'create');
     }
 
     /**
@@ -43,7 +43,29 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|unique:users',
+            'password' => 'required|min:8',
+            'email' => 'required|email',
+            'role' => 'required',
+            'status' => 'required',
+        ]);
+
+        $user = new User;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->role = $request->role;
+        $user->status = $request->status;
+        $user->save();
+
+        Mail::to($user->email)
+        ->send(new UserRegisterVerify($user,'dev.sst.com/verify/ddlsafjl1dfaueiu123u1i4u'));
+
+        Session::flash('status', 'The new user has insert successful!');
+        return redirect()->action('Admin\MemberController@index');
+
+
     }
 
     /**
