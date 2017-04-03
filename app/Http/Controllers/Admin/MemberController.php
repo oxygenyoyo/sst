@@ -87,7 +87,9 @@ class MemberController extends Controller
      */
     public function edit($id)
     {
-        //
+
+        $user = User::where('id',$id)->first();
+        return view($this->viewPrefix . 'edit', ['user' => $user]);
     }
 
     /**
@@ -99,7 +101,23 @@ class MemberController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'password' => 'required|min:8',
+            'email' => 'required|email',
+            'role' => 'required',
+            'status' => 'required',
+        ]);
+
+        $user = User::where('id', $id)->update([
+            'password' => $request->password,
+            'email' => $request->email,
+            'role' => $request->role,
+            'status' => $request->status
+        ]);
+
+        Session::flash('status', 'The user has been edited successful!');
+        return redirect()->action('Admin\MemberController@index');
+
     }
 
     /**

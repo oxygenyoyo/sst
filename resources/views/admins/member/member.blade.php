@@ -65,12 +65,12 @@
                     @if($user->status == 1)
                       <span class="label label-success">Approved</span>
                     @else
-                      <span class="label label-success">Not Verify</span>
+                      <span class="label label-danger">Not Verify</span>
                     @endif
                   </td>
                   <td>
-                    <a href="#" class="btn btn-default">Edit</a>
-                    <a href="#" class="btn btn-danger">Delete</a>
+                    <a href="{{ action('Admin\MemberController@edit',['id' => $user->id])}}" class="btn btn-default">Edit</a>
+                    <a href="{{ action('Admin\MemberController@destroy',['id' => $user->id])}}" class="btn btn-del btn-danger">Delete</a>
                   </td>
                 </tr>
               @endforeach
@@ -83,4 +83,19 @@
     </div>
   </div>
 </section>
+@endsection
+
+@section('js')
+<script>
+  $('.btn-del').on('click', function(event) {
+    event.stopPropagation();
+    event.preventDefualt();
+    var urlDel = $this.attr('href');
+
+    if( confirm('Are you sure want to do this ?') ) {
+      window.location = urlDel;
+    }
+  })
+  
+</script>
 @endsection

@@ -24,6 +24,10 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
 	Route::get('/member', 'MemberController@index');
 	Route::get('/member/create', 'MemberController@create');
 	Route::post('/member/store', 'MemberController@store');
+	Route::get('/member/{id}/edit', 'MemberController@edit');
+	Route::put('/member/{id}', 'MemberController@update');
+	Route::delete('/member/{id}', 'MemberController@destroy');
+
 });
 
 
