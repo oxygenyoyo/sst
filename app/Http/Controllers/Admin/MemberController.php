@@ -8,8 +8,11 @@ use App\User;
 use Session;
 use App\Mail\UserRegisterVerify;
 use Mail;
+
+
 class MemberController extends Controller
 {
+
     public function __construct() 
     {
         $this->viewPrefix = $this->viewPrefix . 'member/';
@@ -128,6 +131,9 @@ class MemberController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::where('id', $id);
+        if ($user->delete()) {
+            return json_encode(['success'=> 'true']);
+        }
     }
 }

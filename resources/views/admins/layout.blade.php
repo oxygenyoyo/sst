@@ -531,16 +531,7 @@
     <div class="control-sidebar-bg"></div>
 </div>
 <!-- ./wrapper -->
-<script>
-$.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-});
-	window.Laravel = <?php echo json_encode([
-	               'csrfToken' => csrf_token(),
-	           ]); ?>
-</script>
+<script>window.Laravel = <?php echo json_encode(['csrfToken' => csrf_token()]); ?></script>
 <script src="{{ mix('js/app.js') }}"></script>
 
 @yield('js')

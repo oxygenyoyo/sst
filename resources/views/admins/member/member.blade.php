@@ -70,7 +70,11 @@
                   </td>
                   <td>
                     <a href="{{ action('Admin\MemberController@edit',['id' => $user->id])}}" class="btn btn-default">Edit</a>
-                    <a href="{{ action('Admin\MemberController@destroy',['id' => $user->id])}}" class="btn btn-del btn-danger">Delete</a>
+                    <button data-del-url="{{ action('Admin\MemberController@destroy',['id' => $user->id])}}" 
+                      class="btn btn-danger del-btn" data-toggle="modal" data-target="#delConfirmModal">
+                        Delete
+                    </button>
+                    
                   </td>
                 </tr>
               @endforeach
@@ -83,18 +87,67 @@
     </div>
   </div>
 </section>
+
+<!-- Modal -->
+<div class="modal modal-danger" id="delConfirmModal" tabindex="-1" role="dialog" aria-labelledby="delConfirmModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">ยืนยันการดำเนินการ</h4>
+      </div>
+      <div class="modal-body">
+        <p>ต้องการดำเนินการลย ใช่หรือไม่ ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline pull-left cancel-del" data-dismiss="modal">Close</button>
+        <button data-url="" id="del-btn" class="btn btn-outline">ลบ</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('js')
 <script>
-  $('.btn-del').on('click', function(event) {
-    event.stopPropagation();
-    event.preventDefualt();
-    var urlDel = $this.attr('href');
-
-    if( confirm('Are you sure want to do this ?') ) {
-      window.location = urlDel;
-    }
+  $('.del-btn').on('click', function() {
+    removeDelClass();
+    $(this).addClass('del-clicked');
+  })
+  $(document).keyup(function(e) {
+      if (e.keyCode == 27) { // escape key maps to keycode `27`
+         removeDelClass() 
+      }
+  });
+  $('.cancel-del').on('click', function() {
+    removeDelClass();
+  })
+  var removeDelClass = function() {
+    $('.del-btn').removeClass('del-clicked');
+  }
+  $('#delConfirmModal').on('shown.bs.modal', function () {
+    var delUrl = $('.del-clicked').data('del-url');
+    
+    $('#del-btn').data('url',delUrl);
+  })
+  $('#del-btn').on('click', function(e) {
+    e.preventDefault();
+    var url = $(this).data('url');
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      url: url,
+      dataType: 'JSON',
+      method: 'DELETE',
+      success: function(res) {
+        if(res.success == 'true') {
+          $('.del-clicked').closest('tr').remove()
+          $('#delConfirmModal').modal('toggle');
+        }
+      }
+    });
   })
   
 </script>
